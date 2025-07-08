@@ -1,19 +1,57 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- main
+  - main
 
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+stages:
+  - stage: Stage1
+    displayName: "First Stage"
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    jobs:
+      - job: Job1
+        displayName: "First Job"
+        steps:
+          - script: echo "This is the first job in the first stage."
+            displayName: "Run a simple script"
+
+      - job: Job2
+        displayName: "Job continueOnError: true"
+        dependsOn: Job1
+        continueOnError: true
+        steps:
+          - script: exit 1
+            displayName: "Fail this job"
+
+          - script: echo "This job will not run because the previous job failed."
+            displayName: "This will not run"
+
+          - script: echo "This job will always run."
+            displayName: "This will always run"
+            condition: always()
+
+      - job: Job3
+        displayName: "Third Job"
+        dependsOn: Job2
+        steps:
+          - script: echo "This job should run because the previous job is set to continue on error."
+            displayName: "Run this job"
+
+          - script: |
+              echo "This step will fail, but should not stop subsequent steps"
+              exit 1
+            displayName: "Step continueOnError: true"
+            continueOnError: true
+
+          - script: echo "This step will run even if the previous step failed."
+            displayName: "Run this step after a failed step"
+
+  - stage: Stage2
+    displayName: "Second Stage"
+
+    jobs:
+      - job: Job4
+        displayName: "Fourth Job"
+        steps:
+          - script: echo "This is the fourth job in the second stage."
+            displayName: "Run a simple script in second stage"
