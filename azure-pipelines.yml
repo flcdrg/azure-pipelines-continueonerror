@@ -12,6 +12,8 @@ stages:
       - job: Job1
         displayName: "First Job"
         steps:
+          - checkout: none
+
           - script: echo "This is the first job in the first stage."
             displayName: "Run a simple script"
 
@@ -20,6 +22,8 @@ stages:
         dependsOn: Job1
         continueOnError: true
         steps:
+          - checkout: none
+
           - script: exit 1
             displayName: "Fail this job"
 
@@ -34,6 +38,8 @@ stages:
         displayName: "Third Job"
         dependsOn: Job2
         steps:
+          - checkout: none
+
           - script: echo "This job should run because the previous job is set to continue on error."
             displayName: "Run this job"
 
@@ -46,6 +52,34 @@ stages:
           - script: echo "This step will run even if the previous step failed."
             displayName: "Run this step after a failed step"
 
+      - job: Job5
+        displayName: "succeededOrFailed"
+        dependsOn: Job2
+        condition: succeededOrFailed()
+        steps:
+          - checkout: none
+
+      - job: Job6
+        displayName: "succeeded()"
+        dependsOn: Job2
+        condition: succeeded()
+        steps:
+          - checkout: none
+
+      - job: Job7
+        displayName: "failed()"
+        dependsOn: Job2
+        condition: failed()
+        steps:
+          - checkout: none
+          
+      - job: Job8
+        displayName: "not(failed())"
+        dependsOn: Job2
+        condition: not(failed())
+        steps:
+          - checkout: none
+
   - stage: Stage2
     displayName: "Second Stage"
 
@@ -53,5 +87,7 @@ stages:
       - job: Job4
         displayName: "Fourth Job"
         steps:
+          - checkout: none
+
           - script: echo "This is the fourth job in the second stage."
             displayName: "Run a simple script in second stage"
